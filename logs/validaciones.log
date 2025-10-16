@@ -1,0 +1,107 @@
+2025-10-16 11:48:33 | INFO | [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-10-16 11:48:33 | INFO | [33mPress CTRL+C to quit[0m
+2025-10-16 11:48:33 | INFO |  * Restarting with stat
+2025-10-16 11:48:33 | WARNING |  * Debugger is active!
+2025-10-16 11:48:33 | INFO |  * Debugger PIN: 100-618-527
+2025-10-16 11:48:36 | INFO | 127.0.0.1 - - [16/Oct/2025 11:48:36] "[36mGET / HTTP/1.1[0m" 304 -
+2025-10-16 11:48:55 | INFO | 127.0.0.1 - - [16/Oct/2025 11:48:55] "[36mGET / HTTP/1.1[0m" 304 -
+2025-10-16 11:49:04 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:04] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:49:04 | INFO | [fc7738ba-9ee0-44b6-b8e6-4190c0a5b43e] Archivo: c971b6b6-16d7-4b76-bfb8-4ee60817b4ef_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.12s | Estado: ERROR
+2025-10-16 11:49:07 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:07] "GET /status/fc7738ba-9ee0-44b6-b8e6-4190c0a5b43e HTTP/1.1" 200 -
+2025-10-16 11:49:24 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:24] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:49:24 | INFO | [9091a275-2903-4528-8ebe-ac9401f8640e] Archivo: 3ea5e920-795f-49c2-9547-c089aa833807_LGT_Art_70_Fr_V_MAL.xlsx | Tama�o: 0.03 MB | Errores: 17 | Tiempo: 0.17s | Estado: ERROR
+2025-10-16 11:49:27 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:27] "GET /status/9091a275-2903-4528-8ebe-ac9401f8640e HTTP/1.1" 200 -
+2025-10-16 11:49:40 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:40] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:49:44 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:44] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:46 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:46] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:49 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:49] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:51 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:51] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:54 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:54] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:56 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:56] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:49:59 | INFO | 127.0.0.1 - - [16/Oct/2025 11:49:59] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:01 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:01] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:04 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:04] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:06 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:06] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:09 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:09] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:11 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:11] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:14 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:14] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:16 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:16] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:19 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:19] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:21 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:21] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:24 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:24] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:26 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:26] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:29 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:29] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:31 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:31] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:34 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:34] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:36 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:36] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:39 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:39] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:41 | INFO | 127.0.0.1 - - [16/Oct/2025 11:50:41] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:50:55 | INFO | [04ed2015-df2a-4ed2-a709-3f2c0df63da4] Archivo: 949d3dc4-d365-4381-a3e2-9b261f1a5ce7_81b-LGT_Art_81_320_5_Lineas.xlsx | Tama�o: 20.79 MB | Errores: 86 | Tiempo: 74.76s | Estado: ERROR
+2025-10-16 11:51:05 | INFO | 127.0.0.1 - - [16/Oct/2025 11:51:05] "GET /status/04ed2015-df2a-4ed2-a709-3f2c0df63da4 HTTP/1.1" 200 -
+2025-10-16 11:51:18 | INFO | 127.0.0.1 - - [16/Oct/2025 11:51:18] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:51:18 | INFO | [9d5a0b61-b878-4383-a77a-82b9d127ba78] Archivo: 54106ac1-2dc1-406c-9253-7ac00a609704_8a-LGT_Art_70_Fr_VIII.xlsx | Tama�o: 0.02 MB | Errores: 1 | Tiempo: 0.07s | Estado: ERROR
+2025-10-16 11:51:21 | INFO | 127.0.0.1 - - [16/Oct/2025 11:51:21] "GET /status/9d5a0b61-b878-4383-a77a-82b9d127ba78 HTTP/1.1" 200 -
+2025-10-16 11:51:36 | INFO | 127.0.0.1 - - [16/Oct/2025 11:51:36] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:51:36 | INFO | [7a79258d-3c56-437e-b5eb-2825d643a4a3] Archivo: 04e9eae5-9a9c-4ce3-aaba-837fcfc0b133_17-LGT_Art_70_Fr_XVII.xlsx | Tama�o: 0.01 MB | Errores: 2 | Tiempo: 0.05s | Estado: ERROR
+2025-10-16 11:51:38 | INFO | 127.0.0.1 - - [16/Oct/2025 11:51:38] "GET /status/7a79258d-3c56-437e-b5eb-2825d643a4a3 HTTP/1.1" 200 -
+2025-10-16 11:52:08 | INFO | 127.0.0.1 - - [16/Oct/2025 11:52:08] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:52:09 | INFO | [5ea2e133-4086-4162-9022-b2712dcd6547] Archivo: 443ffc44-f2d5-4622-ae03-23f34fba6121_malo.xlsx | Tama�o: 0.07 MB | Errores: 1 | Tiempo: 0.36s | Estado: ERROR
+2025-10-16 11:52:11 | INFO | 127.0.0.1 - - [16/Oct/2025 11:52:11] "GET /status/5ea2e133-4086-4162-9022-b2712dcd6547 HTTP/1.1" 200 -
+2025-10-16 11:53:02 | INFO | 127.0.0.1 - - [16/Oct/2025 11:53:02] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:53:02 | INFO | [1077ff5e-70ca-439c-b136-c7f2937b3b9a] Archivo: 43ff3815-e626-44aa-ac65-89759d296824_bueno.xlsx | Tama�o: 0.02 MB | Errores: 1 | Tiempo: 0.05s | Estado: ERROR
+2025-10-16 11:53:05 | INFO | 127.0.0.1 - - [16/Oct/2025 11:53:05] "GET /status/1077ff5e-70ca-439c-b136-c7f2937b3b9a HTTP/1.1" 200 -
+2025-10-16 11:59:34 | INFO | 127.0.0.1 - - [16/Oct/2025 11:59:34] "POST /upload HTTP/1.1" 200 -
+2025-10-16 11:59:34 | INFO | [272bfbec-5843-4beb-8a1e-1d2ea39e3c5d] Archivo: 26cc7e4b-83cc-4a7b-82bc-fdaa76975a9f_bueno.xlsx | Tama�o: 0.02 MB | Errores: 1 | Tiempo: 0.05s | Estado: ERROR
+2025-10-16 11:59:36 | INFO | 127.0.0.1 - - [16/Oct/2025 11:59:36] "GET /status/272bfbec-5843-4beb-8a1e-1d2ea39e3c5d HTTP/1.1" 200 -
+2025-10-16 12:00:24 | INFO | 127.0.0.1 - - [16/Oct/2025 12:00:24] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:00:24 | INFO | [dbb3b175-ba7d-4a96-9740-62a933619be3] Archivo: 80d248ce-8308-4e1d-a2b4-144bfc55d5c8_LGT_Art_70_Fr_V_MAL.xlsx | Tama�o: 0.03 MB | Errores: 17 | Tiempo: 0.12s | Estado: ERROR
+2025-10-16 12:00:26 | INFO | 127.0.0.1 - - [16/Oct/2025 12:00:26] "GET /status/dbb3b175-ba7d-4a96-9740-62a933619be3 HTTP/1.1" 200 -
+2025-10-16 12:07:27 | INFO | 127.0.0.1 - - [16/Oct/2025 12:07:27] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:07:27 | INFO | [5db4458e-bc60-4c47-a6f7-8509093ad7e1] Archivo: 14c6d441-8fa7-4b0e-a88b-d184928d1d47_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.11s | Estado: ERROR
+2025-10-16 12:07:30 | INFO | 127.0.0.1 - - [16/Oct/2025 12:07:30] "GET /status/5db4458e-bc60-4c47-a6f7-8509093ad7e1 HTTP/1.1" 200 -
+2025-10-16 12:09:44 | INFO | 127.0.0.1 - - [16/Oct/2025 12:09:44] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:09:44 | INFO | [92b95247-754a-4efc-ac4d-80225aadd40b] Archivo: 920f5c82-9bd9-4aeb-9058-6cf9d8032a41_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.13s | Estado: ERROR
+2025-10-16 12:09:46 | INFO | 127.0.0.1 - - [16/Oct/2025 12:09:46] "GET /status/92b95247-754a-4efc-ac4d-80225aadd40b HTTP/1.1" 200 -
+2025-10-16 12:11:20 | INFO | 127.0.0.1 - - [16/Oct/2025 12:11:20] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:11:20 | INFO | [f187b0d9-2acf-408d-87ca-76872860a5a4] Archivo: 2cc0576f-4a0c-4660-892e-3074e3cd98f0_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.17s | Estado: ERROR
+2025-10-16 12:11:23 | INFO | 127.0.0.1 - - [16/Oct/2025 12:11:23] "GET /status/f187b0d9-2acf-408d-87ca-76872860a5a4 HTTP/1.1" 200 -
+2025-10-16 12:11:31 | INFO | 127.0.0.1 - - [16/Oct/2025 12:11:31] "[36mGET / HTTP/1.1[0m" 304 -
+2025-10-16 12:11:38 | INFO | 127.0.0.1 - - [16/Oct/2025 12:11:38] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:11:38 | INFO | [8415f337-648a-4614-a9d7-b6e4308c46b4] Archivo: 139c7a75-3660-47a6-805a-9d7a543e0ff8_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.15s | Estado: ERROR
+2025-10-16 12:11:41 | INFO | 127.0.0.1 - - [16/Oct/2025 12:11:41] "GET /status/8415f337-648a-4614-a9d7-b6e4308c46b4 HTTP/1.1" 200 -
+2025-10-16 12:29:24 | INFO | 127.0.0.1 - - [16/Oct/2025 12:29:24] "POST /upload HTTP/1.1" 200 -
+2025-10-16 12:29:24 | INFO | [3ca277b5-7b74-45d2-96c5-56525380489c] Archivo: f7958d50-431c-4901-9fe6-62fdbcc1670d_LGT_Art_70_Fr_V.xlsx | Tama�o: 0.03 MB | Errores: 15 | Tiempo: 0.22s | Estado: ERROR
+2025-10-16 12:29:26 | INFO | 127.0.0.1 - - [16/Oct/2025 12:29:26] "GET /status/3ca277b5-7b74-45d2-96c5-56525380489c HTTP/1.1" 200 -
+2025-10-16 12:45:38 | INFO |  * Detected change in 'C:\\Users\\francisco.martinez\\Desktop\\test-api-sipot-polar\\app.py', reloading
+2025-10-16 12:45:44 | INFO |  * Restarting with stat
+2025-10-16 12:46:16 | INFO | [c63cee18-eb8d-455f-89e7-f67ed4bcd812] Archivo: f5ce20ab-31df-4cd7-95ba-e4bcb1281210_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 14 | Tiempo: 0.37s | Estado: ERROR
+2025-10-16 12:47:47 | INFO | [8e865d0e-6bab-43a5-a42c-f466dafea6d8] Archivo: b143dc5c-0874-46ca-9990-6e1612f46548_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 14 | Tiempo: 0.15s | Estado: ERROR
+2025-10-16 12:58:38 | INFO | [87d4cc6e-c7c2-48de-a928-c254f01873ea] Archivo: c96b4c17-883f-49db-bc65-d2fcdaab3edb_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 14 | Tiempo: 0.07s | Estado: ERROR
+2025-10-16 12:59:37 | INFO | [f8a3456c-e5bc-4ada-a05b-81b98fa2470b] Archivo: 93765e57-5bdb-4a2e-bb52-a93454d25658_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 14 | Tiempo: 0.23s | Estado: ERROR
+2025-10-16 13:04:19 | ERROR | [65166b8b-18d2-43e5-a386-a6d128af3228] Error inesperado: `schema_overrides` should be of type list or dict | Tiempo: 0.09s
+2025-10-16 13:05:02 | ERROR | [0248b682-dc74-490b-ba6f-01ccc25e890b] Error inesperado: `schema_overrides` should be of type list or dict | Tiempo: 0.18s
+2025-10-16 13:10:26 | INFO | [b3bce0be-43b6-42d1-a9e5-cc46854d192d] Archivo: 332e3576-c457-4c79-a92e-8b90dd94b2f7_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 0 | Tiempo: 0.16s | Estado: OK
+2025-10-16 13:10:44 | INFO | [b0a2841b-ab00-4561-9c6a-14fde480830d] Archivo: e88b6ec3-bbdc-4614-9978-c5f7680e56e9_LGT_Art_70_Fr_V_MAL.xlsx | Tamaño: 0.03 MB | Errores: 3 | Tiempo: 0.15s | Estado: ERROR
+2025-10-16 13:11:27 | INFO | [f7cfc718-b14e-47d0-8b1c-463a45e3bfb9] Archivo: cff90639-fc74-4fcd-9193-e709b4ebda33_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 0 | Tiempo: 0.2s | Estado: OK
+2025-10-16 13:13:46 | INFO | [1a111a03-1952-48de-ae3f-2933b165e826] Archivo: a4147522-6f61-49d2-b5db-46d65ab4aea0_81b-LGT_Art_81_320.xlsx | Tamaño: 20.79 MB | Errores: 85 | Tiempo: 115.64s | Estado: ERROR
+2025-10-16 13:20:13 | INFO | [2d66cb18-56f0-4f64-9d12-cfa2ab6abd6b] Archivo: 258912aa-5819-4913-bd25-a9faec378257_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 1 | Tiempo: 0.12s | Estado: ERROR
+2025-10-16 13:24:04 | INFO | [db647b97-52ec-467c-bf67-299558f7ec3a] Archivo: f7a58ff3-aa6a-45f4-a95a-6e0f42bca075_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 86 | Tiempo: 160.5s | Estado: ERROR
+2025-10-16 13:33:10 | INFO | [ecd05e7e-ac87-43b4-8c81-1dff1fe0e7a8] 02b6c6e7-70cd-48b2-ac6b-1c29541776dd_81b-LGT_Art_81_320.xlsx | 20.79 MB | Errores: 85 | 96.4s | ERROR
+2025-10-16 13:47:25 | INFO | [da030bae-5ebb-4a19-83ff-6f526ab78a25] 838b1645-f0cd-4437-8ac1-c2fd09ed981b_81b-LGT_Art_81_320.xlsx | 20.79 MB | Errores: 85 | 134.72s | ERROR
+2025-10-16 13:47:58 | INFO | [bf948301-2aa5-43b0-8bec-9bdbc6d6df2e] dc6cb0a6-cf86-412c-abd8-366cbfe8a356_bueno.xlsx | 0.02 MB | Errores: 1 | 0.14s | ERROR
+2025-10-16 13:48:11 | INFO | [d55ffbcc-0e4d-4339-b84b-220b1eddc3c5] 96d35029-5cf9-4b72-be7e-08ff9344f3c6_LGT_Art_70_Fr_V_MAL.xlsx | 0.03 MB | Errores: 3 | 0.21s | ERROR
+2025-10-16 13:52:22 | INFO | [d567bec1-4faa-43a5-afe2-1aafe622cdb3] e8d0012f-962e-4571-a8ab-e14fcb124003_81b-LGT_Art_81_320.xlsx | 20.79 MB | Errores: 85 | 202.28s | ERROR
+2025-10-16 14:02:26 | INFO | [4967d3ad-915f-4137-9ecf-544c5d26102a] 0dbd4663-5bd3-4603-afd8-d36a71e103e8_prueba.xlsx | 0.03 MB | Errores: 3 | 0.35s | ERROR
+2025-10-16 14:02:39 | INFO | [f4625f29-8c89-4aed-9087-ca11bd3b2d2e] 92f2e9f4-d0b0-49ba-bed1-cfff57f790e6_LGT_Art_70_Fr_V.xlsx | 0.03 MB | Errores: 1 | 0.44s | ERROR
+2025-10-16 14:03:32 | INFO | [2a678eed-ff60-41df-93ad-e9f94d45c5ae] 16f5996f-cdc5-4fd3-ba0e-0f2b7818948e_LGT_Art_70_Fr_V.xlsx | 0.03 MB | Errores: 1 | 0.22s | ERROR
+2025-10-16 14:03:54 | INFO | [5a8a9292-ebac-4221-8e9f-5c51e116545b] db7492a0-60b5-419b-910e-149ea2fa537f_LGT_Art_70_Fr_V.xlsx | 0.03 MB | Errores: 1 | 0.39s | ERROR
+2025-10-16 14:07:08 | INFO | [b49c163b-ca08-4124-ab22-eb0ef4c25742] 545c41f5-bf90-4699-ae81-8bf491a448ac_81b-LGT_Art_81_320.xlsx | 20.79 MB | Errores: 2 | 177.5s | ERROR
+2025-10-16 14:19:31 | INFO | [f96e971b-ee12-4749-9ae7-1207ec92c677] 03644e37-a92b-432a-b71a-6666f5261a1e_81b-LGT_Art_81_320_5_Lineas.xlsx | 20.79 MB | Errores: 2 | 154.44s | ERROR
+2025-10-16 14:25:35 | INFO | [7e465962-7743-49ca-a286-add834c63ad1] 6edae1e5-edfb-4ec5-893b-452508a6dca2_81b-LGT_Art_81_320_5_Lineas.xlsx | 20.79 MB | Errores: 2 | 182.82s | ERROR
+2025-10-16 14:28:51 | INFO | [3992f127-9e18-42fe-bfea-6163e0f92ca6] Archivo: 9365306d-65e9-4506-a937-0ed714e9d9b5_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 2 | Tiempo: 125.9s | Estado: ERROR
+2025-10-16 15:40:56 | INFO | [61fc1497-5409-4f52-b71a-840cf0ff8a42] Archivo: e1c78aae-8ae6-4ca4-b88c-b2e5940d6f74_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 44 | Tiempo: 97.5s | Estado: ERROR
+2025-10-16 15:45:38 | INFO | [70d73601-87bd-4f04-8855-73a002fbd128] Archivo: 724d4078-2583-4b80-ba30-ee4ebc67b75c_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 44 | Tiempo: 226.4s | Estado: ERROR
+2025-10-16 15:46:27 | INFO | [8040460d-016e-4205-bf27-6c1ac82441e3] Archivo: acb30e18-cf2f-49a4-b3e7-a6160cc10728_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 48 | Tiempo: 222.9s | Estado: ERROR
+2025-10-16 16:01:13 | INFO | [998841e5-9cdf-4dc3-a4e3-8a9c61b66062] Archivo: 4482f327-d4b3-483d-905d-9786bcd8e202_bueno.xlsx | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK | Nombre Corto: 8a LGT_Art_70_Fr_VIII
+2025-10-16 16:12:39 | INFO | [2798cced-0e15-4a55-9454-ba3288a57645] Archivo: 62447cbc-0639-4f9b-b15a-406a1a12a6dc_bueno.xlsx | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK | Nombre Corto: 8a LGT_Art_70_Fr_VIII

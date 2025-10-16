@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pre-Validador SIPOT (Polars)</title>
+
+  <link href="https://framework-gb.cdn.gob.mx/assets/styles/main.css" rel="stylesheet" />
+  <style>
+    #loading-spinner, #success-message { display: none; margin-top: 20px; margin-bottom: 20px; }
+    #download-row { margin-top: 20px; display: none; }
+    #error-container { margin-top: 20px; }
+    body { background-color: #f8f9fa; }
+    h1 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+  <header></header>
+
+  <main class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <h1>Pre-Validador SIPOT</h1>
+        <hr />
+
+        <div class="well">
+          <div class="form-group">
+            <label for="archivoExcel">Selecciona un archivo de Excel (.xlsx) o CSV para procesar:</label>
+            <input type="file" id="archivoExcel" class="form-control-file" accept=".xlsx, .xls, .csv" />
+          </div>
+          <button id="btnProcesar" class="btn btn-primary">Procesar y Validar</button>
+          <p id="status" class="small text-muted mt-2">Por favor, selecciona un archivo.</p>
+        </div>
+
+        <div id="loading-spinner" class="text-center">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="sr-only">Cargando...</span>
+          </div>
+          <p id="loading-text" class="mt-2">Subiendo archivo...</p>
+        </div>
+
+        <div id="error-container" class="alert alert-danger" style="display:none;">
+          <h4 id="error-title">Reporte de Errores</h4>
+          <ul id="error-list"></ul>
+        </div>
+
+        <div id="success-message" class="alert alert-success text-center" style="display:none;">
+          <strong>✅ La información es válida y está lista para enviar al backend.</strong>
+        </div>
+
+        <!-- Descarga JSON Backend -->
+        <div id="download-row" class="text-center">
+          <a id="btnJSON" class="btn btn-success" style="display:none;">
+            Descargar JSON Backend
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer></footer>
+
+  <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
+  <script>
+    const btnProcesar     = document.getElementById('btnProcesar');
+    const statusEl        = document.getElementById('status');
+    const errorContainer  = document.getElementById('error-container');
+    const errorList       = document.getElementById('error-list');
+    const errorTitle      = document.getElementById('error-title');
+    const loadingSpinner  = document.getElementById('loading-spinner');
+    const loadingText     = document.getElementById('loading-text');
+    const successMessage  = document.getElementById('success-message');
+    const btnJSON         = document.getElementById('btnJSON');
+    const downloadRow     = document.getElementById('download-row');
+
+    // URL base del servidor (Flask corre en el mismo host)
+    const serverUrl = '';
+
+    // Muestra los resultados finales según el backend Polars
+    function displayFinalResult(result) {
+      loadingSpinner.style.display = 'none';
+      successMessage.style.display = 'none';
+      errorContainer.style.display = 'none';
+      downloadRow.style.display = 'none';
+      btnJSON.style.display = 'none';
+
+      if (result.status === 'error') {
+        // Mostrar errores de validación
+        errorTitle.textContent = 'El archivo contiene los siguientes errores:';
+        errorContainer.style.display = 'block';
+        errorList.innerHTML = '';
+
+        (result.errors || []).forEach(msg => {
+          const li = document.createElement('li');
+          li.textContent = msg;
+          errorList.appendChild(li);
+        });
+
+        statusEl.textContent = 'Corrige los errores en tu archivo y vuelve a intentar.';
+      } 
+      else if (result.status === 'success') {
+        successMessage.style.display = 'block';
+        statusEl.textContent = 'Validación completa.';
+
+        // Mostrar el botón de descarga del JSON Backend
+        btnJSON.href = `${serverUrl}/download/${result.download_file}`;
+        btnJSON.download = 'json_backend.json';
+        btnJSON.style.display = 'inline-block';
+        downloadRow.style.display = 'block';
+      } 
+      else {
+        statusEl.innerHTML = `<strong>Error inesperado:</strong> ${result.error || 'Respuesta desconocida del servidor.'}`;
+      }
+    }
+
+    // Consultar periódicamente el estado del proceso
+    function pollForStatus(taskId) {
+      const intervalId = setInterval(async () => {
+        try {
+          const response = await fetch(`${serverUrl}/status/${taskId}`);
+          const data = await response.json();
+
+          if (data.status === 'complete') {
+            clearInterval(intervalId);
+            displayFinalResult(data.result);
+          } 
+          else if (data.status === 'failed') {
+            clearInterval(intervalId);
+            loadingSpinner.style.display = 'none';
+            statusEl.innerHTML = `<strong>El servidor falló:</strong> ${data.error}`;
+          }
+        } catch (error) {
+          clearInterval(intervalId);
+          loadingSpinner.style.display = 'none';
+          statusEl.innerHTML = `<strong>Error de comunicación:</strong> ${error.message}`;
+        }
+      }, 2500);
+    }
+
+    // Evento principal de procesamiento
+    btnProcesar.addEventListener('click', async () => {
+      const archivo = document.getElementById('archivoExcel').files[0];
+      if (!archivo) {
+        statusEl.textContent = 'Por favor selecciona un archivo antes de continuar.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('archivo', archivo);
+
+      // Reiniciar UI
+      statusEl.textContent = 'Iniciando carga...';
+      errorContainer.style.display = 'none';
+      errorList.innerHTML = '';
+      successMessage.style.display = 'none';
+      btnJSON.style.display = 'none';
+      downloadRow.style.display = 'none';
+      loadingText.textContent = 'Subiendo archivo...';
+      loadingSpinner.style.display = 'block';
+
+      try {
+        const response = await fetch(`${serverUrl}/upload`, { method: 'POST', body: formData });
+        const result = await response.json();
+
+        if (result.error) throw new Error(result.error);
+
+        if (result.task_id) {
+          loadingText.textContent = 'Archivo subido. Procesando con Polars...';
+          pollForStatus(result.task_id);
+        }
+      } catch (error) {
+        loadingSpinner.style.display = 'none';
+        statusEl.innerHTML = `<strong>Error:</strong> ${error.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
