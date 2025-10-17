@@ -6,14 +6,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pre-Validador SIPOT (Polars)</title>
 
+  <!-- Framework de Gobierno de México -->
   <link href="https://framework-gb.cdn.gob.mx/assets/styles/main.css" rel="stylesheet" />
   <style>
     #loading-spinner, #success-message { display: none; margin-top: 20px; margin-bottom: 20px; }
     #download-row { margin-top: 20px; display: none; }
-    #error-container { margin-top: 20px; }
+    #error-container { margin-top: 20px; display:none; }
     body { background-color: #f8f9fa; }
     h1 { margin-top: 30px; }
-    #btnPDF { margin-top: 15px; display: none; }
+    .acuse-msg {
+      margin: 10px 0 0 0;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -42,25 +46,23 @@
           <p id="loading-text" class="mt-2">Subiendo archivo...</p>
         </div>
 
-        <div id="error-container" class="alert alert-danger" style="display:none;">
+        <!-- Contenedor de mensaje de error -->
+        <div id="error-container" class="alert alert-danger">
           <h4 id="error-title">Reporte de Errores</h4>
-          <ul id="error-list"></ul>
-
-          <!-- Nuevo botón para PDF -->
-          <div class="text-center">
-            <a id="btnPDF" class="btn btn-danger">📄 Descargar ACUSE DE ERRORES</a>
-          </div>
+          <p class="acuse-msg">
+            El archivo contiene errores, se genera el acuse de los mismos encontrados en el documento.
+          </p>
+          <a id="btnAcuse" class="btn btn-danger" style="margin-top:10px;">📄 Descargar Acuse de Errores</a>
         </div>
 
-        <div id="success-message" class="alert alert-success text-center" style="display:none;">
+        <!-- Mensaje de éxito -->
+        <div id="success-message" class="alert alert-success text-center">
           <strong>✅ La información es válida y está lista para enviar al backend.</strong>
         </div>
 
         <!-- Descarga JSON Backend -->
         <div id="download-row" class="text-center">
-          <a id="btnJSON" class="btn btn-success" style="display:none;">
-            Descargar JSON Backend
-          </a>
+          <a id="btnJSON" class="btn btn-success" href="#" download="json_backend.json">💾 Descargar JSON Backend</a>
         </div>
       </div>
     </div>
@@ -69,70 +71,67 @@
   <footer></footer>
 
   <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
+
   <script>
     const btnProcesar     = document.getElementById('btnProcesar');
     const statusEl        = document.getElementById('status');
     const errorContainer  = document.getElementById('error-container');
-    const errorList       = document.getElementById('error-list');
-    const errorTitle      = document.getElementById('error-title');
     const loadingSpinner  = document.getElementById('loading-spinner');
     const loadingText     = document.getElementById('loading-text');
     const successMessage  = document.getElementById('success-message');
     const btnJSON         = document.getElementById('btnJSON');
     const downloadRow     = document.getElementById('download-row');
-    const btnPDF          = document.getElementById('btnPDF');
+    const btnAcuse        = document.getElementById('btnAcuse');
 
-    // URL base del servidor (Flask corre en el mismo host)
     const serverUrl = '';
-    let currentTaskId = null;
+    let lastTaskId = null;
 
-    // Muestra los resultados finales según el backend Polars
+    // ===========================
+    // Mostrar resultados finales
+    // ===========================
     function displayFinalResult(result) {
+      console.log("📥 Resultado del backend:", result);
+
       loadingSpinner.style.display = 'none';
       successMessage.style.display = 'none';
       errorContainer.style.display = 'none';
       downloadRow.style.display = 'none';
       btnJSON.style.display = 'none';
-      btnPDF.style.display = 'none';
 
       if (result.status === 'error') {
-        // Mostrar errores de validación
-        errorTitle.textContent = 'El archivo contiene los siguientes errores:';
         errorContainer.style.display = 'block';
-        errorList.innerHTML = '';
-
-        (result.errors || []).forEach(msg => {
-          const li = document.createElement('li');
-          li.textContent = msg;
-          errorList.appendChild(li);
-        });
-
-        // Activar botón de PDF
-        btnPDF.style.display = 'inline-block';
-        btnPDF.onclick = () => {
-          window.open(`${serverUrl}/acuse_errores/${currentTaskId}`, '_blank');
-        };
-
-        statusEl.textContent = 'Corrige los errores en tu archivo y vuelve a intentar.';
+        if (lastTaskId) {
+          btnAcuse.href = `${serverUrl}/acuse_errores/${lastTaskId}`;
+          btnAcuse.setAttribute('download', 'ACUSE_DE_ERRORES.pdf');
+        }
+        statusEl.textContent = 'Se detectaron errores en el archivo.';
       } 
       else if (result.status === 'success') {
         successMessage.style.display = 'block';
         statusEl.textContent = 'Validación completa.';
 
-        // Mostrar el botón de descarga del JSON Backend
-        btnJSON.href = `${serverUrl}/download/${result.download_file}`;
-        btnJSON.download = 'json_backend.json';
-        btnJSON.style.display = 'inline-block';
-        downloadRow.style.display = 'block';
+        // ✅ Forzamos a mostrar el botón sin depender del estado previo
+        const jsonFile = result.download_file ? result.download_file.trim() : "";
+        if (jsonFile !== "") {
+          const urlDescarga = `${serverUrl}/download/${jsonFile}`;
+          btnJSON.href = urlDescarga;
+          btnJSON.download = jsonFile;
+          downloadRow.style.display = 'block';
+          btnJSON.style.display = 'inline-block';
+          console.log("✅ JSON listo para descarga:", urlDescarga);
+        } else {
+          console.warn("⚠️ No se recibió 'download_file' o está vacío:", result);
+        }
       } 
       else {
         statusEl.innerHTML = `<strong>Error inesperado:</strong> ${result.error || 'Respuesta desconocida del servidor.'}`;
       }
     }
 
-    // Consultar periódicamente el estado del proceso
+    // ===========================
+    // Polling de estado
+    // ===========================
     function pollForStatus(taskId) {
-      currentTaskId = taskId;
       const intervalId = setInterval(async () => {
         try {
           const response = await fetch(`${serverUrl}/status/${taskId}`);
@@ -152,10 +151,12 @@
           loadingSpinner.style.display = 'none';
           statusEl.innerHTML = `<strong>Error de comunicación:</strong> ${error.message}`;
         }
-      }, 2500);
+      }, 2000);
     }
 
-    // Evento principal de procesamiento
+    // ===========================
+    // Carga del archivo
+    // ===========================
     btnProcesar.addEventListener('click', async () => {
       const archivo = document.getElementById('archivoExcel').files[0];
       if (!archivo) {
@@ -169,10 +170,8 @@
       // Reiniciar UI
       statusEl.textContent = 'Iniciando carga...';
       errorContainer.style.display = 'none';
-      errorList.innerHTML = '';
       successMessage.style.display = 'none';
       btnJSON.style.display = 'none';
-      btnPDF.style.display = 'none';
       downloadRow.style.display = 'none';
       loadingText.textContent = 'Subiendo archivo...';
       loadingSpinner.style.display = 'block';
@@ -184,7 +183,7 @@
         if (result.error) throw new Error(result.error);
 
         if (result.task_id) {
-          currentTaskId = result.task_id;
+          lastTaskId = result.task_id;
           loadingText.textContent = 'Archivo subido. Procesando con Polars...';
           pollForStatus(result.task_id);
         }

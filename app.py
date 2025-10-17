@@ -4,6 +4,7 @@ Pre-Validador SIPOT (Polars + JSON extendido + ACUSE DE ERRORES)
 ✅ Agrupa errores contiguos por columna
 ✅ Genera PDF institucional (logo grande + encabezado profesional)
 ✅ Logs diarios (validacion_YYYY-MM-DD.log)
+✅ Genera JSON cuando no hay errores y lo expone vía /download/<filename>
 """
 
 # ===============================================================
@@ -41,7 +42,7 @@ for folder in (UPLOAD_FOLDER, DOWNLOAD_FOLDER, LOG_FOLDER, STATIC_FOLDER):
     os.makedirs(folder, exist_ok=True)
 
 # ===============================================================
-# CONFIGURACIÓN DE LOG
+# CONFIGURACIÓN DE LOG (un archivo por día)
 # ===============================================================
 fecha_actual = datetime.now().strftime("%Y-%m-%d")
 log_path = os.path.join(LOG_FOLDER, f"validacion_{fecha_actual}.log")
@@ -144,10 +145,11 @@ def convertir_excel_a_csv(ruta_excel):
     return temp_csv.name
 
 # ===============================================================
-# PROCESAMIENTO PRINCIPAL CON BLOQUES DE ERRORES
+# PROCESAMIENTO PRINCIPAL (con bloques de errores y JSON en éxito)
 # ===============================================================
 def procesar_archivo_en_segundo_plano(filepath, task_id):
     t0 = time.time()
+    csv_path = None
     try:
         ext = os.path.splitext(filepath)[1].lower()
         csv_path = convertir_excel_a_csv(filepath) if ext in (".xlsx", ".xls") else filepath
@@ -161,7 +163,9 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
                          null_values=['', 'NULL', 'null', 'NaN', 'nan'],
                          schema_overrides=schema)
 
+        # eliminar filas completamente vacías
         df = df.filter(pl.any_horizontal(~pl.col("*").is_null() & (pl.col("*").cast(str).str.strip_chars() != "")))
+
         reglas = df.row(3) if df.height > 3 else []
         headers_visibles = [str(h or "").strip() for h in (df.row(6) if df.height > 6 else [])]
         datos = df.slice(7)
@@ -171,9 +175,11 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
         for fila_idx, row in enumerate(datos.iter_rows()):
             abs_row_idx = fila_idx + 7
             for col_idx, valor in enumerate(row):
-                if col_idx >= len(headers_visibles): continue
+                if col_idx >= len(headers_visibles): 
+                    continue
                 header = headers_visibles[col_idx]
-                if header == '': continue
+                if header == '': 
+                    continue
                 if esta_vacio(valor):
                     coord = obtener_coordenada_excel(abs_row_idx, col_idx)
                     lista_de_errores.append(f"Celda {coord} bajo '{header}' vacía.")
@@ -191,7 +197,8 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
             por_col_y_msg = {}
             for err in lista_de_errores:
                 m = patron.search(err)
-                if not m: continue
+                if not m: 
+                    continue
                 col, fila, msg = m.group(1), int(m.group(2)), m.group(3).strip()
                 por_col_y_msg.setdefault((col, msg), []).append(fila)
 
@@ -208,22 +215,71 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
                 bloques.append(f"Celda {col}{ini}" + (f" hasta {col}{prev}" if ini != prev else "") + f" {msg}")
             lista_de_errores = bloques
 
+        # Metadata para logging/resultado
         nombre_corto = df[2, 3] if df.height > 2 and df.width > 3 else 'N/D'
         size_mb = os.path.getsize(filepath) / (1024 * 1024)
         dur = round(time.time() - t0, 1)
         n_err = len(lista_de_errores)
-        estado = "ERROR" if lista_de_errores else "OK"
-        logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Nombre Corto: {nombre_corto} | Tamaño: {size_mb:.2f} MB | Errores: {n_err} | Tiempo: {dur:.1f}s | Estado: {estado}")
 
-        result_status = 'error' if lista_de_errores else 'success'
-        tasks[task_id] = {'status': 'complete', 'result': {'status': result_status, 'errors': lista_de_errores, 'nombre_corto': str(nombre_corto)}}
+        # Si hay errores -> solo devolver errores
+        if lista_de_errores:
+            logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Nombre Corto: {nombre_corto} | Tamaño: {size_mb:.2f} MB | Errores: {n_err} | Tiempo: {dur:.1f}s | Estado: ERROR")
+            tasks[task_id] = {
+                'status': 'complete',
+                'result': {
+                    'status': 'error',
+                    'errors': lista_de_errores,
+                    'nombre_corto': str(nombre_corto)
+                }
+            }
+            return
+
+        # Si NO hay errores -> construir JSON y exponer nombre de archivo
+        id_formato = df[0, 0] if df.height > 0 else "Formato no encontrado"
+        titulo = df[2, 0] if df.height > 2 else ""
+        headers_backend = [str(h or "header_sin_nombre").strip() for h in (df.row(6) if df.height > 6 else [])]
+        datos_backend = df.slice(7)
+
+        registros = []
+        for r in datos_backend.iter_rows():
+            reg = {}
+            for idx, val in enumerate(r):
+                if idx < len(headers_backend):
+                    reg[headers_backend[idx]] = str(val or "")
+            registros.append(reg)
+
+        out_json = {
+            "id_formato": str(id_formato),
+            "Titulo": str(titulo).strip(),
+            "Nombre Corto": str(nombre_corto).strip(),
+            "data": registros
+        }
+
+        json_filename = f"{task_id}.json"
+        json_path = os.path.join(DOWNLOAD_FOLDER, json_filename)
+        with open(json_path, "w", encoding="utf-8") as f:
+            json.dump(out_json, f, ensure_ascii=False, indent=2)
+
+        logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Nombre Corto: {nombre_corto or 'N/D'} | Tamaño: {size_mb:.2f} MB | Errores: 0 | Tiempo: {dur:.1f}s | Estado: OK")
+
+        tasks[task_id] = {
+            'status': 'complete',
+            'result': {
+                'status': 'success',
+                'download_file': json_filename,   # <- CLAVE para el botón del front
+                'nombre_corto': str(nombre_corto)
+            }
+        }
 
     except Exception as e:
         logger.error(f"[{task_id}] Error inesperado: {str(e)}")
         tasks[task_id] = {'status': 'failed', 'error': str(e)}
     finally:
+        # Limpieza de temporales
         if os.path.exists(filepath):
             os.remove(filepath)
+        if csv_path and csv_path != filepath and os.path.exists(csv_path):
+            os.remove(csv_path)
 
 # ===============================================================
 # ENDPOINTS
@@ -250,6 +306,11 @@ def upload():
 def status(task_id):
     return jsonify(tasks.get(task_id, {'status': 'not_found'}))
 
+# ✅ Endpoint para descargar el JSON generado
+@app.route('/download/<filename>')
+def download(filename):
+    return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
+
 # ===============================================================
 # ACUSE DE ERRORES PDF
 # ===============================================================
@@ -272,8 +333,7 @@ def acuse_errores(task_id):
 
         story = []
 
-        # Encabezado
-        from reportlab.platypus import Table, TableStyle
+        # Encabezado con logo izquierda + texto derecha
         if logo_path and os.path.exists(logo_path):
             img = PILImage.open(logo_path)
             aspect = img.width / float(img.height)
@@ -332,4 +392,4 @@ def acuse_errores(task_id):
 # ===============================================================
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1')
-# ==============================================================
+# ===============================================================
