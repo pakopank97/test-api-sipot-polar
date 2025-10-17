@@ -13,6 +13,7 @@
     #error-container { margin-top: 20px; }
     body { background-color: #f8f9fa; }
     h1 { margin-top: 30px; }
+    #btnPDF { margin-top: 15px; display: none; }
   </style>
 </head>
 <body>
@@ -44,6 +45,11 @@
         <div id="error-container" class="alert alert-danger" style="display:none;">
           <h4 id="error-title">Reporte de Errores</h4>
           <ul id="error-list"></ul>
+
+          <!-- Nuevo botón para PDF -->
+          <div class="text-center">
+            <a id="btnPDF" class="btn btn-danger">📄 Descargar ACUSE DE ERRORES</a>
+          </div>
         </div>
 
         <div id="success-message" class="alert alert-success text-center" style="display:none;">
@@ -74,9 +80,11 @@
     const successMessage  = document.getElementById('success-message');
     const btnJSON         = document.getElementById('btnJSON');
     const downloadRow     = document.getElementById('download-row');
+    const btnPDF          = document.getElementById('btnPDF');
 
     // URL base del servidor (Flask corre en el mismo host)
     const serverUrl = '';
+    let currentTaskId = null;
 
     // Muestra los resultados finales según el backend Polars
     function displayFinalResult(result) {
@@ -85,6 +93,7 @@
       errorContainer.style.display = 'none';
       downloadRow.style.display = 'none';
       btnJSON.style.display = 'none';
+      btnPDF.style.display = 'none';
 
       if (result.status === 'error') {
         // Mostrar errores de validación
@@ -97,6 +106,12 @@
           li.textContent = msg;
           errorList.appendChild(li);
         });
+
+        // Activar botón de PDF
+        btnPDF.style.display = 'inline-block';
+        btnPDF.onclick = () => {
+          window.open(`${serverUrl}/acuse_errores/${currentTaskId}`, '_blank');
+        };
 
         statusEl.textContent = 'Corrige los errores en tu archivo y vuelve a intentar.';
       } 
@@ -117,6 +132,7 @@
 
     // Consultar periódicamente el estado del proceso
     function pollForStatus(taskId) {
+      currentTaskId = taskId;
       const intervalId = setInterval(async () => {
         try {
           const response = await fetch(`${serverUrl}/status/${taskId}`);
@@ -156,6 +172,7 @@
       errorList.innerHTML = '';
       successMessage.style.display = 'none';
       btnJSON.style.display = 'none';
+      btnPDF.style.display = 'none';
       downloadRow.style.display = 'none';
       loadingText.textContent = 'Subiendo archivo...';
       loadingSpinner.style.display = 'block';
@@ -167,6 +184,7 @@
         if (result.error) throw new Error(result.error);
 
         if (result.task_id) {
+          currentTaskId = result.task_id;
           loadingText.textContent = 'Archivo subido. Procesando con Polars...';
           pollForStatus(result.task_id);
         }

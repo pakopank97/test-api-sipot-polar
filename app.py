@@ -1,28 +1,30 @@
 """
-Pre-Validador SIPOT (Polars + JSON extendido + Logs)
-------------------------------------------------------------
-✅ Polars >= 0.20.31
-✅ Valida todas las columnas correctamente
-✅ Agrupa rangos contiguos de celdas vacías o erróneas
-✅ Respeta ceros ('0', 0, 0.0) como válidos
-✅ Genera JSON extendido con:
-   - id_formato (celda A1)
-   - Titulo (celda A3)
-   - Nombre Corto (celda D3)
-   - data (usa fila 7 como encabezados visibles)
-✅ Logs diarios estilo clásico
+Pre-Validador SIPOT (Polars + JSON extendido + ACUSE DE ERRORES)
+---------------------------------------------------------------
+✅ Agrupa errores contiguos por columna
+✅ Genera PDF institucional (logo grande + encabezado profesional)
+✅ Logs diarios (validacion_YYYY-MM-DD.log)
 """
 
 # ===============================================================
 # IMPORTS
 # ===============================================================
 import polars as pl
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 import json, re, os, uuid, threading, tempfile, time, logging, math
 from logging.handlers import TimedRotatingFileHandler
 from openpyxl import load_workbook
 from dateutil import parser
+from datetime import datetime
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import (
+    SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image as RLImage
+)
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from PIL import Image as PILImage
 
 # ===============================================================
 # CONFIG FLASK Y CARPETAS
@@ -33,27 +35,44 @@ CORS(app)
 UPLOAD_FOLDER = 'temp_uploads'
 DOWNLOAD_FOLDER = 'temp_downloads'
 LOG_FOLDER = 'logs'
-for folder in (UPLOAD_FOLDER, DOWNLOAD_FOLDER, LOG_FOLDER):
+STATIC_FOLDER = 'static'
+
+for folder in (UPLOAD_FOLDER, DOWNLOAD_FOLDER, LOG_FOLDER, STATIC_FOLDER):
     os.makedirs(folder, exist_ok=True)
 
 # ===============================================================
-# CONFIG LOG DIARIO
+# CONFIGURACIÓN DE LOG
 # ===============================================================
-log_path = os.path.join(LOG_FOLDER, "validaciones.log")
-handler = TimedRotatingFileHandler(log_path, when="midnight", interval=1,
-                                   backupCount=30, encoding='utf-8')
-handler.suffix = "%Y-%m-%d"
-formatter = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+fecha_actual = datetime.now().strftime("%Y-%m-%d")
+log_path = os.path.join(LOG_FOLDER, f"validacion_{fecha_actual}.log")
+
+handler = TimedRotatingFileHandler(
+    log_path, when="midnight", interval=1, backupCount=30, encoding='utf-8', delay=True
+)
+def rotador_por_dia(name):
+    base = os.path.splitext(name)[0]
+    return f"{base}_{datetime.now().strftime('%Y-%m-%d')}.log"
+handler.namer = rotador_por_dia
+
+formatter = logging.Formatter(
+    "%(asctime)s | %(levelname)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
 handler.setFormatter(formatter)
+
 logger = logging.getLogger("validador")
 logger.setLevel(logging.INFO)
-logger.addHandler(handler)
+if not logger.handlers:
+    logger.addHandler(handler)
 
 tasks = {}
 
 # ===============================================================
 # FUNCIONES AUXILIARES
 # ===============================================================
+def obtener_logo():
+    logo_path = os.path.join(STATIC_FOLDER, "Logo_del_Gobierno_de_México.png")
+    return logo_path if os.path.exists(logo_path) else None
+
 def es_numero(v):
     try:
         float(v); return True
@@ -76,7 +95,6 @@ def es_anio(v):
     return es_numero(v) and len(str(v).split('.')[0]) == 4
 
 def esta_vacio(v):
-    """Detecta vacíos reales pero respeta ceros ('0', 0, 0.0)."""
     if v is None:
         return True
     if isinstance(v, (int, float)):
@@ -99,7 +117,6 @@ VALIDADORES = {
 }
 
 def obtener_coordenada_excel(fila, col):
-    """Convierte índices base-0 a coordenada Excel (A1)."""
     col_str = ""
     while col >= 0:
         col_str = chr(ord('A') + col % 26) + col_str
@@ -127,152 +144,86 @@ def convertir_excel_a_csv(ruta_excel):
     return temp_csv.name
 
 # ===============================================================
-# PROCESAMIENTO PRINCIPAL
+# PROCESAMIENTO PRINCIPAL CON BLOQUES DE ERRORES
 # ===============================================================
 def procesar_archivo_en_segundo_plano(filepath, task_id):
     t0 = time.time()
     try:
-        # --- Convertir Excel a CSV temporal ---
         ext = os.path.splitext(filepath)[1].lower()
         csv_path = convertir_excel_a_csv(filepath) if ext in (".xlsx", ".xls") else filepath
 
-        # --- Leer CSV con Polars ---
         with open(csv_path, 'r', encoding='utf-8') as f:
             first = f.readline()
             n_cols = len(first.strip().split(',')) if first else 0
         schema = {str(i): pl.Utf8 for i in range(n_cols)}
 
-        df = pl.read_csv(
-            csv_path,
-            has_header=False,
-            infer_schema_length=0,
-            null_values=['', 'NULL', 'null', 'NaN', 'nan'],
-            schema_overrides=schema
-        )
+        df = pl.read_csv(csv_path, has_header=False, infer_schema_length=0,
+                         null_values=['', 'NULL', 'null', 'NaN', 'nan'],
+                         schema_overrides=schema)
 
-        # Quitar filas completamente vacías
         df = df.filter(pl.any_horizontal(~pl.col("*").is_null() & (pl.col("*").cast(str).str.strip_chars() != "")))
-
-        # Fila 4 → reglas, fila 7 → encabezados visibles
-        reglas  = df.row(3) if df.height > 3 else []
-        headers_visibles = df.row(6) if df.height > 6 else []
-        headers_visibles = [str(h or "").strip() for h in headers_visibles]
+        reglas = df.row(3) if df.height > 3 else []
+        headers_visibles = [str(h or "").strip() for h in (df.row(6) if df.height > 6 else [])]
         datos = df.slice(7)
-
         lista_de_errores = []
 
-        # ================= VALIDACIÓN =================
+        # Validación base
         for fila_idx, row in enumerate(datos.iter_rows()):
             abs_row_idx = fila_idx + 7
             for col_idx, valor in enumerate(row):
-                if col_idx >= len(headers_visibles):
-                    continue
+                if col_idx >= len(headers_visibles): continue
                 header = headers_visibles[col_idx]
-                if header == '':
-                    continue
+                if header == '': continue
                 if esta_vacio(valor):
                     coord = obtener_coordenada_excel(abs_row_idx, col_idx)
                     lista_de_errores.append(f"Celda {coord} bajo '{header}' vacía.")
-                regla = str(reglas[col_idx]).split('.')[0] if col_idx < len(reglas) else '0'
-                if regla in VALIDADORES and not esta_vacio(valor):
-                    val = VALIDADORES[regla]
-                    if not val['func'](valor):
-                        coord = obtener_coordenada_excel(abs_row_idx, col_idx)
-                        lista_de_errores.append(f"Celda {coord} ('{valor}') inválida. Se esperaba: {val['nombre']}.")
+                else:
+                    regla = str(reglas[col_idx]).split('.')[0] if col_idx < len(reglas) else '0'
+                    if regla in VALIDADORES:
+                        val = VALIDADORES[regla]
+                        if not val['func'](valor):
+                            coord = obtener_coordenada_excel(abs_row_idx, col_idx)
+                            lista_de_errores.append(f"Celda {coord} ('{valor}') inválida. Se esperaba: {val['nombre']}.")
 
-        # ================= AGRUPAR ERRORES =================
+        # Agrupar errores contiguos
         if lista_de_errores:
             patron = re.compile(r"Celda\s+([A-Z]+)(\d+)\s+(.*)")
             por_col_y_msg = {}
             for err in lista_de_errores:
                 m = patron.search(err)
-                if not m:
-                    continue
-                col = m.group(1)
-                fila = int(m.group(2))
-                msg = m.group(3).strip()
+                if not m: continue
+                col, fila, msg = m.group(1), int(m.group(2)), m.group(3).strip()
                 por_col_y_msg.setdefault((col, msg), []).append(fila)
 
             bloques = []
             for (col, msg), filas in por_col_y_msg.items():
                 filas.sort()
-                ini = filas[0]
-                prev = filas[0]
+                ini, prev = filas[0], filas[0]
                 for f in filas[1:]:
                     if f == prev + 1:
                         prev = f
                         continue
-                    if ini == prev:
-                        bloques.append(f"Celda {col}{ini} {msg}")
-                    else:
-                        bloques.append(f"Celda {col}{ini} hasta {col}{prev} {msg}")
+                    bloques.append(f"Celda {col}{ini}" + (f" hasta {col}{prev}" if ini != prev else "") + f" {msg}")
                     ini = prev = f
-                if ini == prev:
-                    bloques.append(f"Celda {col}{ini} {msg}")
-                else:
-                    bloques.append(f"Celda {col}{ini} hasta {col}{prev} {msg}")
-
+                bloques.append(f"Celda {col}{ini}" + (f" hasta {col}{prev}" if ini != prev else "") + f" {msg}")
             lista_de_errores = bloques
-            n_err = len(lista_de_errores)
-            dur = round(time.time() - t0, 1)
-            size_mb = os.path.getsize(filepath) / (1024 * 1024)
-            logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Tamaño: {size_mb:.2f} MB | "
-                        f"Errores: {n_err} | Tiempo: {dur:.1f}s | Estado: ERROR")
-            tasks[task_id] = {'status': 'complete', 'result': {'status': 'error', 'errors': lista_de_errores}}
-            return
 
-        # ===================== JSON BACKEND ==========================
-        formato = df[0, 0] if df.height > 0 else "Formato no encontrado"
-
-        # Fila 7 como encabezados de datos
-        headers_backend = df.row(6) if df.height > 6 else []
-        headers_backend = [str(h or "header_sin_nombre").strip() for h in headers_backend]
-        datos_backend = df.slice(7)
-
-        # --- Extraer Titulo (A3) y Nombre Corto (D3) ---
-        titulo = df[2, 0] if df.height > 2 and df.width > 0 else ""
-        nombre_corto = df[2, 3] if df.height > 2 and df.width > 3 else ""
-
-        # --- Generar registros ---
-        registros = []
-        for r in datos_backend.iter_rows():
-            registro = {}
-            for idx, valor in enumerate(r):
-                if idx < len(headers_backend):
-                    header = headers_backend[idx]
-                    registro[header] = str(valor or "")
-            registros.append(registro)
-
-        # --- Estructura final ---
-        out_json = {
-            "id_formato": str(formato),
-            "Titulo": str(titulo).strip(),
-            "Nombre Corto": str(nombre_corto).strip(),
-            "data": registros
-        }
-
-        json_path = os.path.join(DOWNLOAD_FOLDER, f"{task_id}.json")
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(out_json, f, ensure_ascii=False, indent=2)
-
-        dur = round(time.time() - t0, 1)
+        nombre_corto = df[2, 3] if df.height > 2 and df.width > 3 else 'N/D'
         size_mb = os.path.getsize(filepath) / (1024 * 1024)
-        logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Tamaño: {size_mb:.2f} MB | "
-                    f"Errores: 0 | Tiempo: {dur:.1f}s | Estado: OK | Nombre Corto: {nombre_corto}")
+        dur = round(time.time() - t0, 1)
+        n_err = len(lista_de_errores)
+        estado = "ERROR" if lista_de_errores else "OK"
+        logger.info(f"[{task_id}] Archivo: {os.path.basename(filepath)} | Nombre Corto: {nombre_corto} | Tamaño: {size_mb:.2f} MB | Errores: {n_err} | Tiempo: {dur:.1f}s | Estado: {estado}")
 
-        tasks[task_id] = {'status': 'complete',
-                          'result': {'status': 'success', 'download_file': f"{task_id}.json"}}
+        result_status = 'error' if lista_de_errores else 'success'
+        tasks[task_id] = {'status': 'complete', 'result': {'status': result_status, 'errors': lista_de_errores, 'nombre_corto': str(nombre_corto)}}
 
     except Exception as e:
-        dur = round(time.time() - t0, 1)
-        logger.error(f"[{task_id}] Error inesperado: {str(e)} | Tiempo: {dur:.1f}s")
+        logger.error(f"[{task_id}] Error inesperado: {str(e)}")
         tasks[task_id] = {'status': 'failed', 'error': str(e)}
-
     finally:
         if os.path.exists(filepath):
             os.remove(filepath)
-        if 'csv_path' in locals() and csv_path != filepath and os.path.exists(csv_path):
-            os.remove(csv_path)
 
 # ===============================================================
 # ENDPOINTS
@@ -288,8 +239,7 @@ def upload():
     archivo = request.files['archivo']
     if archivo.filename == '':
         return jsonify({"error": "No se seleccionó archivo"}), 400
-    filename = f"{uuid.uuid4()}_{archivo.filename}"
-    ruta = os.path.join(UPLOAD_FOLDER, filename)
+    ruta = os.path.join(UPLOAD_FOLDER, f"{uuid.uuid4()}_{archivo.filename}")
     archivo.save(ruta)
     task_id = str(uuid.uuid4())
     tasks[task_id] = {'status': 'processing'}
@@ -300,13 +250,86 @@ def upload():
 def status(task_id):
     return jsonify(tasks.get(task_id, {'status': 'not_found'}))
 
-@app.route('/download/<filename>')
-def download(filename):
-    return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
+# ===============================================================
+# ACUSE DE ERRORES PDF
+# ===============================================================
+@app.route('/acuse_errores/<task_id>', methods=['GET'])
+def acuse_errores(task_id):
+    try:
+        task = tasks.get(task_id)
+        if not task or 'result' not in task or 'errors' not in task['result']:
+            return jsonify({'error': 'No hay errores registrados para este task_id.'}), 404
+
+        errores = task['result']['errors']
+        nombre_corto = task['result'].get('nombre_corto', 'N/D')
+        fecha_validacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        logo_path = obtener_logo()
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        styles = getSampleStyleSheet()
+        p_err = ParagraphStyle("err", parent=styles["Normal"], fontSize=9, leading=12, wordWrap="CJK")
+
+        story = []
+
+        # Encabezado
+        from reportlab.platypus import Table, TableStyle
+        if logo_path and os.path.exists(logo_path):
+            img = PILImage.open(logo_path)
+            aspect = img.width / float(img.height)
+            width = 200
+            height = width / aspect
+            logo_img = RLImage(logo_path, width=width, height=height)
+        else:
+            logo_img = Paragraph(" ", styles["Normal"])
+
+        texto_header = Paragraph(
+            '<b><font color="#000000">Sistema de Validación<br/>de Formatos SIPOT</font></b>',
+            ParagraphStyle("HeaderRight", parent=styles["Normal"], fontSize=12, leading=14, alignment=2)
+        )
+
+        header_table = Table([[logo_img, texto_header]], colWidths=[180, 340])
+        header_table.setStyle(TableStyle([
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ]))
+        story.append(header_table)
+        story.append(Spacer(1, 5))
+        story.append(Paragraph('<para backcolor="#A51C30" spaceb="3"></para>', styles['Normal']))
+        story.append(Spacer(1, 10))
+
+        story.append(Paragraph("<b>ACUSE DE ERRORES</b>", styles['Title']))
+        story.append(Paragraph(f"<b>Nombre del Formato:</b> {nombre_corto}", styles['Normal']))
+        story.append(Paragraph(f"<b>Fecha de validación:</b> {fecha_validacion}", styles['Normal']))
+        story.append(Spacer(1, 12))
+        story.append(Paragraph("A continuación se despliegan los errores detectados durante la validación del formato:", styles['Normal']))
+        story.append(Spacer(1, 10))
+
+        datos_tabla = [["#", "Descripción del error"]]
+        for idx, e in enumerate(errores, 1):
+            datos_tabla.append([idx, Paragraph(str(e), p_err)])
+        tabla = Table(datos_tabla, colWidths=[35, doc.width - 35], repeatRows=1)
+        tabla.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#A51C30")),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.gray),
+        ]))
+        story.append(tabla)
+        story.append(Spacer(1, 15))
+        story.append(Paragraph("Documento generado automáticamente por el validador SIPOT.", styles['Italic']))
+
+        doc.build(story)
+        buffer.seek(0)
+        return send_file(buffer, as_attachment=True, download_name="ACUSE_DE_ERRORES.pdf", mimetype="application/pdf")
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ===============================================================
-# EJECUCIÓN
+# MAIN
 # ===============================================================
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1')
-# ===============================================================
+# ==============================================================

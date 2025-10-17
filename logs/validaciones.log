@@ -104,4 +104,19 @@
 2025-10-16 15:45:38 | INFO | [70d73601-87bd-4f04-8855-73a002fbd128] Archivo: 724d4078-2583-4b80-ba30-ee4ebc67b75c_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 44 | Tiempo: 226.4s | Estado: ERROR
 2025-10-16 15:46:27 | INFO | [8040460d-016e-4205-bf27-6c1ac82441e3] Archivo: acb30e18-cf2f-49a4-b3e7-a6160cc10728_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 48 | Tiempo: 222.9s | Estado: ERROR
 2025-10-16 16:01:13 | INFO | [998841e5-9cdf-4dc3-a4e3-8a9c61b66062] Archivo: 4482f327-d4b3-483d-905d-9786bcd8e202_bueno.xlsx | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK | Nombre Corto: 8a LGT_Art_70_Fr_VIII
-2025-10-16 16:12:39 | INFO | [2798cced-0e15-4a55-9454-ba3288a57645] Archivo: 62447cbc-0639-4f9b-b15a-406a1a12a6dc_bueno.xlsx | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK | Nombre Corto: 8a LGT_Art_70_Fr_VIII
+2025-10-16 16:12:39 | INFO | [2798cced-0e15-4a55-9454-ba3288a57645] Archivo: 62447cbc-0639-4f9b-b15a-406a1a12a6dc_bueno.xlsx | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK | Nombre Corto: 8a LGT_Art_70_Fr_VIII2025-10-16 16:57:23 | INFO | [3e496b05-7525-4d69-b918-c89d056fa551] Archivo: 6acdb842-08f7-4d03-ad55-e42b4874d08f_LGT_Art_70_Fr_V.xlsx | Tamaño: 0.03 MB | Errores: 1 | Tiempo: 0.3s | Estado: ERROR
+2025-10-16 16:57:38 | INFO | [47b8ec69-dd94-407e-b005-7266e9d2a316] Archivo: 215bf68a-06be-45fa-b027-1b81c89665a4_LGT_Art_70_Fr_V_MAL.xlsx | Tamaño: 0.03 MB | Errores: 3 | Tiempo: 0.2s | Estado: ERROR
+2025-10-16 17:14:56 | INFO | [28510206-d163-47f6-a80a-32ccfeb3b2ef] Archivo: 75ad6a53-10f3-48fb-9ef2-142b2d692f7e_LGT_Art_70_Fr_V_MAL.xlsx | Tamaño: 0.03 MB | Errores: 3 | Tiempo: 0.3s | Estado: ERROR
+2025-10-16 17:20:18 | INFO | [66a1c72b-f99a-4963-8817-5c70b1a8911c] Archivo: fb9704ac-e77c-475f-9d68-fb0bfdffafed_81b-LGT_Art_81_320_5_Lineas.xlsx | Tamaño: 20.79 MB | Errores: 48 | Tiempo: 158.3s | Estado: ERROR
+2025-10-16 17:24:22 | INFO | [970048ca-0f89-4ab0-a1f1-62719057ad39] Archivo: 9d2458f2-666b-43a7-9161-0829d578caf3_bueno.xlsx | Nombre Corto: 8a LGT_Art_70_Fr_VIII | Tamaño: 0.02 MB | Errores: 0 | Tiempo: 0.1s | Estado: OK
+2025-10-16 17:24:32 | INFO | [3e9f6e88-f4ac-4321-aa7e-a424c4cc7d0b] Archivo: e4a9683b-897d-4098-8975-602e8f37ae9e_malo.xlsx | Nombre Corto: 8a LGT_Art_70_Fr_VIII | Tamaño: 0.07 MB | Errores: 18 | Tiempo: 0.7s | Estado: ERROR
+2025-10-16 17:29:50 | INFO | [d6c784b5-637d-4f68-b11a-88355443de33] Archivo: d2782de8-b845-4174-a0bd-90dd56eccd85_malo.xlsx | Nombre Corto: 8a LGT_Art_70_Fr_VIII | Tamaño: 0.07 MB | Errores: 18 | Tiempo: 0.7s | Estado: ERROR
+2025-10-16 17:44:32 | INFO | [f4ce14fb-a737-494e-bb49-5f2ea904437d] Archivo: 77a47fb7-2033-4c5f-af08-b8b9c3c3b64b_81b-LGT_Art_81_320_5_Lineas.xlsx | Nombre Corto: 81b LGT_Art_81 | Tamaño: 20.79 MB | Errores: 400031 | Tiempo: 226.8s | Estado: ERROR
+2025-10-16 17:58:13 | INFO | [81f3a1a5-134a-4baf-87db-85738cf8979f] Archivo: fb3cacca-a173-4bb5-9068-67f569d95161_81b-LGT_Art_81_320_5_Lineas.xlsx | Nombre Corto: 81b LGT_Art_81 | Tamaño: 20.79 MB | Errores: 48 | Tiempo: 163.6s | Estado: ERROR
+2025-10-16 17:59:10 | INFO | [456c4dea-2cb1-414d-af55-0e8ec1f745aa] Archivo: 5356e6f0-dad7-4ddf-ac39-43ed9b5091cb_LGT_Art_70_Fr_V.xlsx | Nombre Corto: 5 LGT_Art_70_Fr_V | Tamaño: 0.03 MB | Errores: 1 | Tiempo: 0.1s | Estado: ERROR2025-10-17 09:56:21 | INFO | Descargando logo institucional desde Wikimedia...
+2025-10-17 09:56:21 | WARNING | No se pudo descargar el logo institucional: no library called "cairo-2" was found
+no library called "cairo" was found
+no library called "libcairo-2" was found
+cannot load library 'libcairo.so.2': error 0x7e.  Additionally, ctypes.util.find_library() did not manage to locate a library called 'libcairo.so.2'
+cannot load library 'libcairo.2.dylib': error 0x7e.  Additionally, ctypes.util.find_library() did not manage to locate a library called 'libcairo.2.dylib'
+cannot load library 'libcairo-2.dll': error 0x7e.  Additionally, ctypes.util.find_library() did not manage to locate a library called 'libcairo-2.dll'

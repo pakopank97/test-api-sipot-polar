@@ -1,0 +1,42 @@
+{
+  "id_formato": "43315",
+  "Titulo": "Remuneraciones brutas y netas de todas las personas servidoras públicas de base y de confianza",
+  "Nombre Corto": "8a LGT_Art_70_Fr_VIII",
+  "data": [
+    {
+      "Ejercicio": "1",
+      "Fecha de inicio del periodo que se informa": "2025-10-10 00:00:00",
+      "Fecha de término del periodo que se informa": "2025-10-10 00:00:00",
+      "Tipo de integrante del sujeto obligado (catálogo)": "Persona servidora pública",
+      "Clave o nivel del puesto": "Alto",
+      "Denominación o descripción del puesto (Redactados con perspectiva de género)": "NO se cual es",
+      "Denominación del cargo (de conformidad con el nombramiento otorgado)": "Otra que no se",
+      "Área de adscripción": "Juridico",
+      "Nombre (s)": "Francisco Daniel",
+      "Primer apellido": "Martinez",
+      "Segundo apellido": "Martinez",
+      "ESTE CRITERIO APLICA A PARTIR DEL 01/04/2023 -> Sexo (catálogo )": "Hombre",
+      "Monto de la remuneración mensual bruta  de conformidad al Tabulador de sueldos y salarios que corresponda": "10000",
+      "Tipo de moneda de la remuneración mensual bruta": "MXN",
+      "Monto de la remuneración mensual neta  de conformidad al Tabulador de sueldos y salarios que corresponda": "15948",
+      "Tipo de moneda de la remuneración mensual neta": "MXN",
+      "Percepciones adicionales en dinero  Monto bruto y neto  tipo de moneda y su periodicidad   Tabla_333781": "Colocar el ID de los registros de la Tabla_333781",
+      "Percepciones adicionales en especie y su periodicidad  Tabla_333767": "Colocar el ID de los registros de la Tabla_333767",
+      "Ingresos  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333782": "Colocar el ID de los registros de la Tabla_333782",
+      "Sistemas de compensación  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333751": "Colocar el ID de los registros de la Tabla_333751",
+      "Gratificaciones  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333771": "Colocar el ID de los registros de la Tabla_333771",
+      "Primas  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333758": "Colocar el ID de los registros de la Tabla_333758",
+      "Comisiones  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333768": "Colocar el ID de los registros de la Tabla_333768",
+      "Dietas  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333759": "Colocar el ID de los registros de la Tabla_333759",
+      "Bonos  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333760": "Colocar el ID de los registros de la Tabla_333760",
+      "Estímulos  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333779": "Colocar el ID de los registros de la Tabla_333779",
+      "Apoyos económicos  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333783": "Colocar el ID de los registros de la Tabla_333783",
+      "Prestaciones económicas  monto bruto y neto  tipo de moneda y su periodicidad  Tabla_333780": "Colocar el ID de los registros de la Tabla_333780",
+      "Prestaciones en especie y su periodicidad  Tabla_333784": "Colocar el ID de los registros de la Tabla_333784",
+      "Área(s) responsable(s) que genera(n)  posee(n)  publica(n) y actualizan la información": "Diosito",
+      "Fecha de Actualización": "2025-10-16 00:00:00",
+      "Nota": "Ninguna",
+      "header_sin_nombre": ""
+    }
+  ]
+}
