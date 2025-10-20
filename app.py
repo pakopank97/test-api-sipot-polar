@@ -1,6 +1,6 @@
 """
 Pre-Validador SIPOT (Polars + JSON extendido + ACUSE DE ERRORES)
----------------------------------------------------------------
+----------------------------------------------------------------
 ✅ Agrupa errores contiguos por columna
 ✅ Genera PDF institucional (logo grande + encabezado profesional)
 ✅ Logs diarios (validacion_YYYY-MM-DD.log)
@@ -42,14 +42,20 @@ for folder in (UPLOAD_FOLDER, DOWNLOAD_FOLDER, LOG_FOLDER, STATIC_FOLDER):
     os.makedirs(folder, exist_ok=True)
 
 # ===============================================================
-# CONFIGURACIÓN DE LOG (un archivo por día)
+# CONFIGURACIÓN DE LOG (Windows y Linux)
 # ===============================================================
 fecha_actual = datetime.now().strftime("%Y-%m-%d")
+
+# --- 🧩 OPCIÓN WINDOWS (Desarrollo local)
 log_path = os.path.join(LOG_FOLDER, f"validacion_{fecha_actual}.log")
+
+# --- 🧩 OPCIÓN LINUX (Servidor QA)
+# log_path = f"/app/logs/validacion_{fecha_actual}.log"
 
 handler = TimedRotatingFileHandler(
     log_path, when="midnight", interval=1, backupCount=30, encoding='utf-8', delay=True
 )
+
 def rotador_por_dia(name):
     base = os.path.splitext(name)[0]
     return f"{base}_{datetime.now().strftime('%Y-%m-%d')}.log"
@@ -175,10 +181,10 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
         for fila_idx, row in enumerate(datos.iter_rows()):
             abs_row_idx = fila_idx + 7
             for col_idx, valor in enumerate(row):
-                if col_idx >= len(headers_visibles): 
+                if col_idx >= len(headers_visibles):
                     continue
                 header = headers_visibles[col_idx]
-                if header == '': 
+                if header == '':
                     continue
                 if esta_vacio(valor):
                     coord = obtener_coordenada_excel(abs_row_idx, col_idx)
@@ -197,7 +203,7 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
             por_col_y_msg = {}
             for err in lista_de_errores:
                 m = patron.search(err)
-                if not m: 
+                if not m:
                     continue
                 col, fila, msg = m.group(1), int(m.group(2)), m.group(3).strip()
                 por_col_y_msg.setdefault((col, msg), []).append(fila)
@@ -266,7 +272,7 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
             'status': 'complete',
             'result': {
                 'status': 'success',
-                'download_file': json_filename,   # <- CLAVE para el botón del front
+                'download_file': json_filename,
                 'nombre_corto': str(nombre_corto)
             }
         }
@@ -275,7 +281,6 @@ def procesar_archivo_en_segundo_plano(filepath, task_id):
         logger.error(f"[{task_id}] Error inesperado: {str(e)}")
         tasks[task_id] = {'status': 'failed', 'error': str(e)}
     finally:
-        # Limpieza de temporales
         if os.path.exists(filepath):
             os.remove(filepath)
         if csv_path and csv_path != filepath and os.path.exists(csv_path):
@@ -306,90 +311,13 @@ def upload():
 def status(task_id):
     return jsonify(tasks.get(task_id, {'status': 'not_found'}))
 
-# ✅ Endpoint para descargar el JSON generado
 @app.route('/download/<filename>')
 def download(filename):
     return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
 
 # ===============================================================
-# ACUSE DE ERRORES PDF
-# ===============================================================
-@app.route('/acuse_errores/<task_id>', methods=['GET'])
-def acuse_errores(task_id):
-    try:
-        task = tasks.get(task_id)
-        if not task or 'result' not in task or 'errors' not in task['result']:
-            return jsonify({'error': 'No hay errores registrados para este task_id.'}), 404
-
-        errores = task['result']['errors']
-        nombre_corto = task['result'].get('nombre_corto', 'N/D')
-        fecha_validacion = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        logo_path = obtener_logo()
-        buffer = BytesIO()
-        doc = SimpleDocTemplate(buffer, pagesize=letter)
-        styles = getSampleStyleSheet()
-        p_err = ParagraphStyle("err", parent=styles["Normal"], fontSize=9, leading=12, wordWrap="CJK")
-
-        story = []
-
-        # Encabezado con logo izquierda + texto derecha
-        if logo_path and os.path.exists(logo_path):
-            img = PILImage.open(logo_path)
-            aspect = img.width / float(img.height)
-            width = 200
-            height = width / aspect
-            logo_img = RLImage(logo_path, width=width, height=height)
-        else:
-            logo_img = Paragraph(" ", styles["Normal"])
-
-        texto_header = Paragraph(
-            '<b><font color="#000000">Sistema de Validación<br/>de Formatos SIPOT</font></b>',
-            ParagraphStyle("HeaderRight", parent=styles["Normal"], fontSize=12, leading=14, alignment=2)
-        )
-
-        header_table = Table([[logo_img, texto_header]], colWidths=[180, 340])
-        header_table.setStyle(TableStyle([
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-        ]))
-        story.append(header_table)
-        story.append(Spacer(1, 5))
-        story.append(Paragraph('<para backcolor="#A51C30" spaceb="3"></para>', styles['Normal']))
-        story.append(Spacer(1, 10))
-
-        story.append(Paragraph("<b>ACUSE DE ERRORES</b>", styles['Title']))
-        story.append(Paragraph(f"<b>Nombre del Formato:</b> {nombre_corto}", styles['Normal']))
-        story.append(Paragraph(f"<b>Fecha de validación:</b> {fecha_validacion}", styles['Normal']))
-        story.append(Spacer(1, 12))
-        story.append(Paragraph("A continuación se despliegan los errores detectados durante la validación del formato:", styles['Normal']))
-        story.append(Spacer(1, 10))
-
-        datos_tabla = [["#", "Descripción del error"]]
-        for idx, e in enumerate(errores, 1):
-            datos_tabla.append([idx, Paragraph(str(e), p_err)])
-        tabla = Table(datos_tabla, colWidths=[35, doc.width - 35], repeatRows=1)
-        tabla.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#A51C30")),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('ALIGN', (0, 0), (0, -1), 'CENTER'),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.gray),
-        ]))
-        story.append(tabla)
-        story.append(Spacer(1, 15))
-        story.append(Paragraph("Documento generado automáticamente por el validador SIPOT.", styles['Italic']))
-
-        doc.build(story)
-        buffer.seek(0)
-        return send_file(buffer, as_attachment=True, download_name="ACUSE_DE_ERRORES.pdf", mimetype="application/pdf")
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-# ===============================================================
 # MAIN
 # ===============================================================
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1')
+    app.run(debug=True, host='0.0.0.0', port=8081)
 # ===============================================================

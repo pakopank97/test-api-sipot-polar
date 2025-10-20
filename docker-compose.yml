@@ -1,0 +1,12 @@
+services:
+  prevalidador_sipot:
+    container_name: prevalidador_sipot
+    build: .
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./logs:/app/logs
+      - ./temp_uploads:/app/temp_uploads
+      - ./temp_downloads:/app/temp_downloads
+      - ./static:/app/static
+    restart: unless-stopped
